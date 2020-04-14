@@ -1,0 +1,22 @@
+{
+  "name": "ephemeral-indexing",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "redis",
+    "redisearch"
+  ],
+  "author": "Kyle Davis",
+  "license": "MIT",
+  "dependencies": {
+    "commander": "^5.0.0",
+    "fastify": "^2.13.0",
+    "fastify-static": "^2.6.0",
+    "loose-json": "^1.1.2",
+    "redis": "^3.0.2"
+  }
+}
