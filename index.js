@@ -7,6 +7,7 @@ const
   redis           = require('redis'),
   path            = require('path'),
   { promisify }   = require('util'),
+  _               = require('lodash'),
   fnv1a           = require('@sindresorhus/fnv1a'),
   products        = require('./products.js'),
   users           = require('./users.js'),
@@ -63,6 +64,22 @@ fastify.get('/product/:id', byIdentifer(products,'id'));
 
 fastify.get('/user/:start/:end',list(users));
 fastify.get('/user/:email',byIdentifer(users,'email'));
+
+const indexPurchase = (indexName,itemId,purchaseTime) => {
+  let details = products.get(itemId);
+  return ft_add(
+    indexName,
+    fnv1a(indexName+[purchaseTime,itemId]),
+    1,
+    'FIELDS',
+    'purchased', purchaseTime,
+    'title', details.title,
+    'price', details.price,
+    'desc', details.description,
+    'itemid', itemId
+  );
+}
+
 fastify.put('/user/:email',async (request) => {
   // User login
   const
@@ -71,10 +88,11 @@ fastify.put('/user/:email',async (request) => {
     indexName       = `user:${hashedEmail}`;
 
   let createResult;
-  const indexPurchases = async (history) =>
-  history.map(
-    (item) => {
-      let details = products.get(item[1]);
+  const indexPurchases = async (history) => history.map(
+    (item) =>  indexPurchase(indexName,item[1],item[0])
+  );
+      
+      /*let details = products.get(item[1]);
 
       return ft_add(
         indexName,
@@ -86,9 +104,9 @@ fastify.put('/user/:email',async (request) => {
         'price', details.price,
         'desc', details.description,
         'itemid', item[1]
-      )
-    }
-  );
+      )*/
+
+
 
 
   let userPurchases;
@@ -103,7 +121,9 @@ fastify.put('/user/:email',async (request) => {
         'price', 'NUMERIC',
         'itemid','TEXT'
     );
+    console.log('purchase history',purchaseHistory)
     userPurchases = await indexPurchases(purchaseHistory);
+    console.log(userPurchases);
   } catch(err) {
     if (!String(err).includes('Index already exists')) {
       throw err;
@@ -116,27 +136,29 @@ fastify.put('/user/:email',async (request) => {
 
 fastify.get('/buy/:user/:id',async (request) => {
   await purchases.buy(request.params.user,request.params.id);
+
   return { id : request.params.id };
 });
 
 fastify.get('/buy-history/:user/:offset/:search?', async (request) => {
-  // Display user purchase history + search
-  const purchaseHistory = await purchases.history(request.params.user);
-  const purchaseHistoryItems = purchaseHistory.map((pair) => {
-    const itemDetails = products.get(pair[1]);
-    return {
-      purchaseTime  : Number(pair[0]),
-      id            : pair[1],
-      title         : itemDetails.title,
-      description   : itemDetails.description,
-      price         : itemDetails.price 
-    };
-  });
+  const
+    hashedEmail     = fnv1a(request.params.user),
+    indexName       = `user:${hashedEmail}`,
+    searchResults   = await ft_search(indexName, request.params['search?'] || '*'),
+    resultCount     = searchResults.shift();
+  let
+    items   = searchResults
+      .filter((_,index) => index % 2)
+      .map((el) => _(el)
+        .chunk(2)
+        .fromPairs()
+        .value()
+      );
 
-  return {
-    search  : request.params['search?'],
-    offset  : request.params.offset,
-    items   : purchaseHistoryItems 
+  return { 
+    search    : request.params['search?'],
+    offset    : request.params.offset,
+    items 
   };
 });
 

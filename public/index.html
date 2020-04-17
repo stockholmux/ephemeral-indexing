@@ -129,10 +129,10 @@
           </thead>
           <tbody>
             <tr v-for="(historyObj, historyObjIndex) in history.results.items">
-              <td>{{ new Intl.DateTimeFormat('en-US', {hour: 'numeric', minute: 'numeric', second: 'numeric', year: 'numeric', month: 'numeric', day: 'numeric'}).format(new Date(historyObj.purchaseTime)) }}</td>
+              <td>{{ new Intl.DateTimeFormat('en-US', {hour: 'numeric', minute: 'numeric', second: 'numeric', year: 'numeric', month: 'numeric', day: 'numeric'}).format(new Date(Number(historyObj.purchased))) }}</td>
               <td>
                 <div><strong>{{ historyObj.title }}</strong></div>
-                <div>{{ historyObj.description }}</div>
+                <div>{{ historyObj.desc }}</div>
               </td>
               <td>${{ historyObj.price }}</td>
             </tr>
