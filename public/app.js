@@ -5,6 +5,12 @@ function has(obj) {
   }
   return true;
 }
+//#Source https://bit.ly/2neWfJ2 
+const chunk = (arr, size) =>
+  Array.from({ length: Math.ceil(arr.length / size) }, (v, i) =>
+    arr.slice(i * size, i * size + size)
+  );
+
 const fetchOK = response => {
   if (!response.ok) { throw response; }
   return response.json(); 
@@ -19,7 +25,8 @@ var router = new VueRouter({
     { name : 'item',    path: '/item/:id' },
     { name : 'page',    path: '/page/:page'},
     { name : 'user',    path: '/user/:userpage' },
-    { name : 'history', path: '/purchase-history/:historypage/:historysearch?'}
+    { name : 'history', path: '/purchase-history/:historypage/:historysearch?'},
+    { name : 'info',    path: '/info/:infopage' }
   ]
 });
 
@@ -56,7 +63,8 @@ var shopApp = new Vue({
         query   : ''
       },
       query   : ''
-    }
+    },
+    indexInfo : []
   },
   methods: {
     pageSwitcher(newParam, oldParam) {
@@ -65,6 +73,10 @@ var shopApp = new Vue({
         this.page = 0;
         this.offset = 0;
         this.loadPage();
+      } else if(has(this.$route.params,'infopage')) {
+        this.view = 'info';
+        this.loadInfo();
+
       } else if (has(this.$route.params,'historypage') && this.user.current.email) {
         this.history.query = this.$route.params.historysearch || '';
         this.view = 'history';
@@ -148,6 +160,23 @@ var shopApp = new Vue({
           setTimeout(() => this.purchase.message = '', 2000);
         })
         .catch(fetchErr);
+    },
+    loadInfo() {
+      console.log('load info');
+      fetch(
+        new Request(`/indexes`)
+      )
+        .then(fetchOK)
+        .then(json => {
+          this.indexInfo = json
+            .map((idxInfo) => Object.fromEntries(chunk(idxInfo,2)))
+            .map((idxInfo) => ({
+              index_name  : idxInfo.index_name,
+              num_docs    : idxInfo.num_docs,
+              num_records : idxInfo.num_records,
+              bytes_per_record_avg : idxInfo.bytes_per_record_avg
+            }))
+        });
     },
     loadPage() {
       let products = this.products;

@@ -68,19 +68,19 @@
       <div v-if="view == 'page'">
         <div>
           <router-link v-if="page > 0" :to="{ name: 'page', params: { page:  page - 1 }}">Prev</router-link>
-          {{ page }}
+          Page {{ page }}
           <router-link :to="{ name: 'page', params: { page:  page + 1 }}">Next</router-link>
         </div>
         <div v-for="(productObj, productObjIndex) in products">
           <h2>
             <router-link :to="{ name: 'item', params: { id: productObj.id }}">{{productObj.title}}</router-link>
           </h2>
-          <h3>{{productObj.price}}</h3>
+          <h3>${{productObj.price}}</h3>
           <hr class="uk-divider-icon">
         </div>
         <div>
           <router-link v-if="page > 0" :to="{ name: 'page', params: { page:  this.page - 1 }}">Prev</router-link>
-          {{ page }}
+          Page {{ page }}
           <router-link :to="{ name: 'page', params: { page:  this.page + 1 }}">Next</router-link>
         </div>
       </div>
@@ -104,7 +104,7 @@
         
         <div>
           <router-link v-if="user.page > 0" :to="{ name: 'user', params: { userpage:  Number(user.page) - 1 }}">Prev</router-link>
-          {{ user.page }}
+          Page {{ user.page }}
           <router-link :to="{ name: 'user', params: { userpage:  Number(user.page) + 1 }}">Next</router-link>
         </div>
         <div><router-link :to="{ name: 'page', params: { page }}">Back to items</router-link></div>
@@ -139,6 +139,27 @@
           </tbody>
         </table>
       </div>
+      <div v-if="view == 'info'">
+        <h4>RediSearch Indexes</h4>
+        <div>Current index count: {{this.indexInfo.length}}</div>
+        <pre v-for="(anIndexInfo) in this.indexInfo">
+{{anIndexInfo}}
+        </pre>
+      </div>
+    </div>
+    <div class="uk-container uk-margin">
+      <div class="uk-container uk-container-small">
+
+        <div v-if="this.view !== 'info'">
+          View live <router-link :to="{ name: 'info', params: { infopage: 0 } }">information about current indexes</router-link>
+        </div>
+
+        <div>
+          Try <a href="https://redisearch.io/">RediSearch</a> from <a href="https://redislabs.com">Redis Labs</a>.
+        </div>
+        
+      </div>
+      
     </div>
   </div>
     
