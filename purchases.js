@@ -4,9 +4,10 @@ const
   filename = (user) => `users/${fnv1a(user)}.txt`;
 
 module.exports = {
-  buy       : (user,itemId) => fs.appendFile(
+  buy       : (user,itemId,purchaseTime) => fs.appendFile(
     filename(user), 
-    `${new Date().getTime()},${itemId}\r\n`
+    //`${new Date().getTime()},${itemId}\r\n`
+    `${purchaseTime},${itemId}\r\n`
   ),
   history   : async (user) => {
     try {
