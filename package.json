@@ -18,7 +18,7 @@
     "fastify": "^2.13.0",
     "fastify-static": "^2.6.0",
     "html-entities": "^1.2.1",
-    "lodash": "^4.17.15",
+    "lodash": "^4.17.19",
     "loose-json": "^1.1.2",
     "redis": "^3.0.2"
   }
