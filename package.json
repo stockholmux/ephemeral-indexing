@@ -16,7 +16,7 @@
     "@sindresorhus/fnv1a": "^2.0.0",
     "commander": "^5.0.0",
     "fastify": "^2.13.0",
-    "fastify-static": "^4.2.4",
+    "fastify-static": "^4.4.1",
     "html-entities": "^1.2.1",
     "lodash": "^4.17.15",
     "loose-json": "^1.1.2",
